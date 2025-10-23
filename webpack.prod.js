@@ -91,11 +91,6 @@ module.exports = {
       filename: "index.html",
       chunks: ["index"],
       inject: true,
-      templateParameters: {
-        // 内联 HTML 片段
-        headContent: fs.readFileSync(path.join(__dirname, 'src/common/head.html'), 'utf8'),
-        footerContent: fs.readFileSync(path.join(__dirname, 'src/common/footer.html'), 'utf8'),
-      },
       minify: {
         html5: true,
         collapseWhitespace: true,
@@ -110,10 +105,6 @@ module.exports = {
       filename: "search.html",
       chunks: ["search"],
       inject: true,
-      templateParameters: {
-        // 内联 HTML 片段
-        metaContent: fs.readFileSync(path.join(__dirname, 'src/search/meta.html'), 'utf8'),
-      },
       minify: {
         html5: true,
         collapseWhitespace: true,
