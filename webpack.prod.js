@@ -6,25 +6,46 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const glob = require("glob");
 
-
 const getMPA = () => {
   const entry = {};
   const htmlWebpackPlugins = [];
 
   const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
-  console.log(entryFiles);
-  
+  entryFiles.map((entryFile) => {
+    // /Users/nanxiao/webpack/src/search/index.js
 
-}
+    const match = entryFile.match(/src\/(.*)\/index\.js/);
+    const pageName = match && match[1];
+    entry[pageName] = entryFile;
 
-getMPA();
+    htmlWebpackPlugins.push(
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, `src/${pageName}/index.html`),
+        filename: `${pageName}.html`,
+        chunks: [pageName],
+        inject: true,
+        minify: {
+          html5: true,
+          collapseWhitespace: true,
+          preserveLineBreaks: false,
+          minifyCSS: true,
+          minifyJS: true,
+          removeComments: false,
+        },
+      })
+    );
+  });
 
+  return {
+    entry,
+    htmlWebpackPlugins,
+  };
+};
+
+const { entry, htmlWebpackPlugins } = getMPA();
 
 module.exports = {
-  entry: {
-    index: "./src/index/index.js",
-    search: "./src/search/index.js",
-  },
+  entry,
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name]_[chunkhash:8].js",
@@ -101,40 +122,12 @@ module.exports = {
   },
   mode: "production",
   plugins: [
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/index/index.html"),
-      filename: "index.html",
-      chunks: ["index"],
-      inject: true,
-      minify: {
-        html5: true,
-        collapseWhitespace: true,
-        preserveLineBreaks: false,
-        minifyCSS: true,
-        minifyJS: true,
-        removeComments: false,
-      },
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/search/index.html"),
-      filename: "search.html",
-      chunks: ["search"],
-      inject: true,
-      minify: {
-        html5: true,
-        collapseWhitespace: true,
-        preserveLineBreaks: false,
-        minifyCSS: true,
-        minifyJS: true,
-        removeComments: false,
-      },
-    }),
     new MiniCssExtractPlugin({
       filename: "[name].[contenthash:8].css",
       chunkFilename: "[name].[contenthash:8].chunk.css",
     }),
     new CleanWebpackPlugin(), // 使用 webpack 5 内置清理功能
-  ],
+  ].concat(htmlWebpackPlugins),
   optimization: {
     minimize: true,
     minimizer: [
