@@ -48,6 +48,7 @@ module.exports = {
     ],
   },
   mode: "development",
+  devtool: "eval-cheap-module-source-map", // 开发环境推荐配置
   // 需要手动刷新浏览器
   // watch: true,
   devServer: {

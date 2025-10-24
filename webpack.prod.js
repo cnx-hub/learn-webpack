@@ -13,7 +13,6 @@ const getMPA = () => {
   const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
   entryFiles.map((entryFile) => {
     // /Users/nanxiao/webpack/src/search/index.js
-
     const match = entryFile.match(/src\/(.*)\/index\.js/);
     const pageName = match && match[1];
     entry[pageName] = entryFile;
@@ -121,6 +120,7 @@ module.exports = {
     ],
   },
   mode: "production",
+  devtool: "source-map", // 生产环境推荐配置
   plugins: [
     new MiniCssExtractPlugin({
       filename: "[name].[contenthash:8].css",
