@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: {
     index: "./src/index/index.js",
-    search: "./src/search/search.js",
+    search: "./src/search/index.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -71,7 +71,7 @@ module.exports = {
       },
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/search/search.html"),
+      template: path.join(__dirname, "src/search/index.html"),
       filename: "search.html",
       chunks: ["search"],
       inject: true,

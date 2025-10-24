@@ -4,11 +4,26 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const glob = require("glob");
+
+
+const getMPA = () => {
+  const entry = {};
+  const htmlWebpackPlugins = [];
+
+  const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
+  console.log(entryFiles);
+  
+
+}
+
+getMPA();
+
 
 module.exports = {
   entry: {
     index: "./src/index/index.js",
-    search: "./src/search/search.js",
+    search: "./src/search/index.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -101,7 +116,7 @@ module.exports = {
       },
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src/search/search.html"),
+      template: path.join(__dirname, "src/search/index.html"),
       filename: "search.html",
       chunks: ["search"],
       inject: true,
