@@ -144,4 +144,10 @@ module.exports = {
   //   resolve: {
   //     extensions: ['.js', '.jsx']
   //   }
+  
+  // 外部依赖配置 - 使用 CDN
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM'
+  }
 };
