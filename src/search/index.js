@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import logo from "../images/logo.png";
+import { common } from "../../common/index";
 import "./search.less";
 
 class Search extends React.Component {
@@ -11,6 +12,8 @@ class Search extends React.Component {
     this.state = {
       state: 1,
     };
+
+    common();
   }
 
   render() {

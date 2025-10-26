@@ -138,16 +138,27 @@ module.exports = {
         },
       }),
     ],
+
+    splitChunks: {
+      minSize: 0,
+      cacheGroups: {
+        commons: {
+          name: "commons",
+          chunks: "all",
+          minChunks: 2,
+        },
+      },
+    },
   },
 
   //   自动补全文件扩展名
   //   resolve: {
   //     extensions: ['.js', '.jsx']
   //   }
-  
+
   // 外部依赖配置 - 使用 CDN
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM'
-  }
+    react: "React",
+    "react-dom": "ReactDOM",
+  },
 };
