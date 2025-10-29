@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const glob = require("glob");
 
 const getMPA = () => {
@@ -119,7 +120,8 @@ module.exports = {
       },
     ],
   },
-  mode: "production",
+  // mode: "none",
+  mode: 'production',
   devtool: "source-map", // 生产环境推荐配置
   plugins: [
     new MiniCssExtractPlugin({
@@ -131,6 +133,7 @@ module.exports = {
   optimization: {
     minimize: true,
     minimizer: [
+      new TerserPlugin(),
       new CssMinimizerPlugin({
         // 可选：更强压缩 & 去注释
         minimizerOptions: {
