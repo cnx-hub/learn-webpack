@@ -5,23 +5,36 @@ import logo from "../images/logo.png";
 import "./search.less";
 
 class Search extends React.Component {
-
-
   constructor() {
     super();
     this.state = {
       state: 1,
     };
 
-    common();
+    this.state = {
+      Text: null,
+    };
+
+    // common();
+  }
+
+  loadComponent() {
+    import("./text.js").then((Text) => {
+      this.setState({
+        Text: Text.default,
+      });
+    });
   }
 
   render() {
+    const { Text } = this.state;
+
     return (
       <div className="search-text">
         搜索文字的内容
-        <img src={logo} />
-
+        {Text ? <Text /> : null}
+        {/* {comp && React.createElement(Text)} */}
+        <img src={logo} onClick={this.loadComponent.bind(this)} />
         <div></div>
       </div>
     );
