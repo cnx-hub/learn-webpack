@@ -1,0 +1,174 @@
+const path = require("path");
+const fs = require("fs");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const webpack = require("webpack");
+const glob = require("glob");
+
+const getMPA = () => {
+  const entry = {};
+  const htmlWebpackPlugins = [];
+
+  const entryFiles = glob.sync(path.join(__dirname, "./src/*/index-server.js"));
+  entryFiles.map((entryFile) => {
+    // /Users/nanxiao/webpack/src/search/index.js
+    const match = entryFile.match(/src\/(.*)\/index-server\.js/);
+    const pageName = match && match[1];
+    entry[pageName] = entryFile;
+
+    htmlWebpackPlugins.push(
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, `src/${pageName}/index.html`),
+        filename: `${pageName}.html`,
+        chunks: [pageName],
+        inject: true,
+        minify: {
+          html5: true,
+          collapseWhitespace: true,
+          preserveLineBreaks: false,
+          minifyCSS: true,
+          minifyJS: true,
+          removeComments: false,
+        },
+      })
+    );
+  });
+
+  return {
+    entry,
+    htmlWebpackPlugins,
+  };
+};
+
+const { entry, htmlWebpackPlugins } = getMPA();
+
+module.exports = {
+  target: "node", // 关键：设置为 Node.js 环境，避免使用浏览器 API（如 self、document）
+  entry,
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name]-server.js",
+    libraryTarget: "umd",
+    globalObject: "globalThis",
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+        },
+      },
+      {
+        test: /.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [require("autoprefixer")],
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "less-loader",
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require("autoprefixer")({
+                    browsers: ["last 2 version", ">1%", "ios 7"],
+                  }),
+                ],
+              },
+            },
+          },
+          {
+            loader: "px2rem-loader",
+            options: {
+              remUnit: 10,
+              remPrecision: 8,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif|jpeg)$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10240,
+            },
+            // loader: "file-loader",
+          },
+        ],
+      },
+      {
+        test: /.(woff|woff2|eot|ttf|otf)$/,
+        use: "file-loader",
+      },
+    ],
+  },
+  mode: "none",
+  // mode: 'production',
+  devtool: "source-map", // 生产环境推荐配置
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "[name].[contenthash:8].css",
+      chunkFilename: "[name].[contenthash:8].chunk.css",
+    }),
+    new CleanWebpackPlugin({}),
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    }),
+  ].concat(htmlWebpackPlugins),
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin(),
+      new CssMinimizerPlugin({
+        // 可选：更强压缩 & 去注释
+        minimizerOptions: {
+          preset: ["default", { discardComments: { removeAll: true } }],
+        },
+      }),
+    ],
+
+    splitChunks: {
+      minSize: 0,
+      cacheGroups: {
+        commons: {
+          name: "commons",
+          chunks: "all",
+          minChunks: 2,
+        },
+      },
+    },
+  },
+
+  //   自动补全文件扩展名
+  //   resolve: {
+  //     extensions: ['.js', '.jsx']
+  //   }
+
+  // 外部依赖配置 - 使用 CDN
+  // externals: {
+  //   react: "React",
+  //   "react-dom": "ReactDOM",
+  // },
+};
