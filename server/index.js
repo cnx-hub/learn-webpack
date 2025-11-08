@@ -9,6 +9,7 @@ const express = require("express");
 const React = require("react");
 const { renderToString } = require("react-dom/server");
 const SSR = require("../dist/search-server.js");
+const data = require("./data.json");
 const template = fs.readFileSync(
   path.join(__dirname, "../dist/search.html"),
   "utf-8"
@@ -64,7 +65,7 @@ const server = (port) => {
       // const initialData = await fetchData();
 
       // 生成完整 HTML
-      const html = renderMarkup(htmlStr);
+      const html = renderMarkup(htmlStr, data);
 
       res.status(200).send(html);
     } catch (error) {
