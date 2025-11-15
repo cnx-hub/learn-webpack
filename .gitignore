@@ -1,6 +1,7 @@
 yalc.lock
 .DS_Store
 node_modules
+stats.json
 /server-dist/
 /static-dist/
 yarn.lock
