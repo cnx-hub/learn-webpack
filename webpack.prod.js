@@ -7,6 +7,11 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const webpack = require("webpack");
 const glob = require("glob");
+const PerformanceAnalysisPlugin = require("./plugins/PerformanceAnalysisPlugin");
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
+// 使用环境变量控制是否启用性能分析
+const enablePerformanceAnalysis = process.env.ENABLE_SPEED_MEASURE === "true";
 
 const getMPA = () => {
   const entry = {};
@@ -45,7 +50,7 @@ const getMPA = () => {
 
 const { entry, htmlWebpackPlugins } = getMPA();
 
-module.exports = {
+const config = {
   entry,
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -127,18 +132,21 @@ module.exports = {
     }),
     new CleanWebpackPlugin(), // 使用 webpack 5 内置清理功能
     new webpack.optimize.ModuleConcatenationPlugin(),
-    function () {
-      this.hooks.done.tap("done", (stats) => {
-        if (
-          stats.compilation.errors &&
-          stats.compilation.errors.length &&
-          process.argv.indexOf("--watch") == -1
-        ) {
-          console.log("build error");
-          process.exit(1);
-        }
-      });
-    },
+    // 条件性添加性能分析插件
+    ...(enablePerformanceAnalysis ? [new PerformanceAnalysisPlugin({ loaderTopFiles: 10 })] : []),
+    // function () {
+    //   this.hooks.done.tap("done", (stats) => {
+    //     if (
+    //       stats.compilation.errors &&
+    //       stats.compilation.errors.length &&
+    //       process.argv.indexOf("--watch") == -1
+    //     ) {
+    //       console.log("build error");
+    //       process.exit(1);
+    //     }
+    //   });
+    // },
+    new BundleAnalyzerPlugin(),
   ].concat(htmlWebpackPlugins),
   optimization: {
     minimize: true,
@@ -170,10 +178,10 @@ module.exports = {
   //   }
 
   // 外部依赖配置 - 使用 CDN
-  externals: {
-    react: "React",
-    "react-dom": "ReactDOM",
-  },
+  // externals: {
+  //   react: "React",
+  //   "react-dom": "ReactDOM",
+  // },
   stats: {
     // all: false,
     errors: true,
@@ -183,4 +191,7 @@ module.exports = {
     timings: true,
     builtAt: true,
   },
-};
+}
+
+// 直接导出配置（使用自定义性能分析插件，避免兼容性问题）
+module.exports = config;
