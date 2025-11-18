@@ -157,6 +157,9 @@ const config = {
     //   });
     // },
     // new BundleAnalyzerPlugin(),
+    new webpack.DllReferencePlugin({
+      manifest: require('./build/library/library.json')
+    }),
   ].concat(htmlWebpackPlugins),
   optimization: {
     minimize: true,
