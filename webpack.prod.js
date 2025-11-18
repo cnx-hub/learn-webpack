@@ -120,6 +120,16 @@ const config = {
         test: /.(woff|woff2|eot|ttf|otf)$/,
         use: "file-loader",
       },
+      {
+        test: /\.(js)$/,
+        use: [
+          {
+            loader: 'thread-loader',
+            options: {
+              workers: 3
+            }
+          }]
+      }
     ],
   },
   mode: "none",
@@ -146,12 +156,14 @@ const config = {
     //     }
     //   });
     // },
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
   ].concat(htmlWebpackPlugins),
   optimization: {
     minimize: true,
     minimizer: [
-      new TerserPlugin(),
+      new TerserPlugin({
+        parallel: 4
+      }),
       new CssMinimizerPlugin({
         // 可选：更强压缩 & 去注释
         minimizerOptions: {

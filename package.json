@@ -9,7 +9,8 @@
     "build:ssr": "webpack --config webpack.ssr.js",
     "watch": "webpack --watch",
     "dev": "webpack-dev-server --config webpack.dev.js --open",
-    "build:stats": "webpack --config webpack.prod.js --json > stats.json"
+    "build:stats": "webpack --config webpack.prod.js --json > stats.json",
+    "dll": "webpack --config webpack.dll.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "raw-loader": "^4.0.2",
     "speed-measure-webpack-plugin": "^1.5.0",
     "terser-webpack-plugin": "^5.3.14",
+    "thread-loader": "^4.0.4",
     "webpack": "^5.102.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1",
