@@ -59,13 +59,13 @@ const config = {
   },
   module: {
     rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-        },
-      },
+      // {
+      //   test: /\.(js|jsx)$/,
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: "babel-loader",
+      //   },
+      // },
       {
         test: /.css$/,
         use: [
@@ -114,6 +114,30 @@ const config = {
             },
             // loader: "file-loader",
           },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              mozjpeg: {
+                progressive: true,
+                quality: 65
+              },
+              // optipng.enabled: false will disable optipng
+              optipng: {
+                enabled: false,
+              },
+              pngquant: {
+                quality: '65-90',
+                speed: 4
+              },
+              gifsicle: {
+                interlaced: false,
+              },
+              // the webp option will enable WEBP
+              webp: {
+                quality: 75
+              }
+            }
+          }
         ],
       },
       {
@@ -121,14 +145,23 @@ const config = {
         use: "file-loader",
       },
       {
-        test: /\.(js)$/,
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'thread-loader',
             options: {
               workers: 3
             }
-          }]
+          },
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              cacheCompression: false,
+            }
+          }
+        ]
       }
     ],
   },
@@ -165,7 +198,8 @@ const config = {
     minimize: true,
     minimizer: [
       new TerserPlugin({
-        parallel: 4
+        parallel: 4,
+        // cache: true
       }),
       new CssMinimizerPlugin({
         // 可选：更强压缩 & 去注释
@@ -188,9 +222,11 @@ const config = {
   },
 
   //   自动补全文件扩展名
-  //   resolve: {
-  //     extensions: ['.js', '.jsx']
-  //   }
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    modules: [path.resolve(__dirname, 'node_modules')],
+    mainFields: ['main']
+  },
 
   // 外部依赖配置 - 使用 CDN
   // externals: {
@@ -206,6 +242,13 @@ const config = {
     timings: true,
     builtAt: true,
   },
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename], // 当 webpack 配置变更时使缓存失效
+    },
+  },
+
 }
 
 // 直接导出配置（使用自定义性能分析插件，避免兼容性问题）
