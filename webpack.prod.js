@@ -9,6 +9,7 @@ const webpack = require("webpack");
 const glob = require("glob");
 const PerformanceAnalysisPlugin = require("./plugins/PerformanceAnalysisPlugin");
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { PurgeCSSPlugin } = require('purgecss-webpack-plugin');
 
 // 使用环境变量控制是否启用性能分析
 const enablePerformanceAnalysis = process.env.ENABLE_SPEED_MEASURE === "true";
@@ -112,7 +113,10 @@ const config = {
             options: {
               limit: 10240,
             },
-            // loader: "file-loader",
+            // loader: 'file-loader',
+            // options: {
+            //   name: '[name]_[hash:8].[ext]'
+            // }
           },
           {
             loader: 'image-webpack-loader',
@@ -126,7 +130,7 @@ const config = {
                 enabled: false,
               },
               pngquant: {
-                quality: '65-90',
+                quality: [0.65, 0.90],
                 speed: 4
               },
               gifsicle: {
@@ -175,6 +179,23 @@ const config = {
     }),
     new CleanWebpackPlugin(), // 使用 webpack 5 内置清理功能
     new webpack.optimize.ModuleConcatenationPlugin(),
+    // PurgeCSS 插件：去除未使用的 CSS
+    new PurgeCSSPlugin({
+      paths: [
+        ...glob.sync(`${path.join(__dirname, 'src')}/**/*.{html,js,jsx}`, { nodir: true }),
+        // 如果使用模板文件，也需要包含
+        ...glob.sync(`${path.join(__dirname, 'src')}/**/*.html`, { nodir: true }),
+      ],
+      safelist: {
+        // 保留动态生成的类名（如果需要）
+        // standard: [/^slick-/], // 例如保留 slick-carousel 的类
+        // deep: [/^my-custom-class$/],
+        // greedy: [/^my-custom-class$/]
+      },
+      // 其他配置选项
+      // only: ['bundle', 'vendor'], // 只处理特定的 chunk
+      // 默认情况下会保留 :root、:before、:after 等伪类和伪元素
+    }),
     // 条件性添加性能分析插件
     ...(enablePerformanceAnalysis ? [new PerformanceAnalysisPlugin({ loaderTopFiles: 10 })] : []),
     // function () {
