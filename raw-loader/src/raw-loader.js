@@ -15,6 +15,10 @@ module.exports = function (source) {
 
     this.cacheable(false);
 
+    // this.cacheable(false);
+    // const callback = this.async();
+    // console.log('name', name);
+
 
     const json = JSON.stringify(source)
         .replace('foo', '')
@@ -22,6 +26,14 @@ module.exports = function (source) {
         .replace(/\u2029/g, '\\u2029');
 
 
+
+    // fs.readFile(path.join(__dirname, './async.txt'), 'utf-8', (err, data) => {
+    //     if (err) {
+    //         callback(err, '');
+    //     }
+    //     callback(null, data);
+    // });
+    // 
 
     return `export default ${json}`;
 }
